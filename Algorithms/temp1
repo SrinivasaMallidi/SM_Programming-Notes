@@ -1,28 +1,29 @@
-from django.shortcuts import render
-from .models import Server, DBDetails
+from django.db import models
 
-# Create your views here.
+class Server(models.Model):
+    name = models.CharField(max_length=100)
+    ip_address = models.CharField(max_length=100)
+    cluster_name = models.CharField(max_length=100)
+    tag = models.CharField(max_length=100)
 
-def home(request):
-    context = {}
-    return render(request, 'common/home.html',context)
+    def __str__(self):
+        return self.name
 
-def viewGWMS(request):
-    # Retrieve all Server instances
-    servers = Server.objects.all()
-    for i in servers:
-        print(i.tag)
+class ApplicationUrl(models.Model):
+    url = models.URLField()
+    name = models.CharField(max_length=100)
+    server = models.ForeignKey(Server, on_delete=models.CASCADE, related_name='application_urls')
 
-    #  Get unique tags and sort them in ascending order
-    tags = sorted(set(server.tag for server in servers))
+    def __str__(self):
+        return self.url
 
-    # Query DBDetails based on the tag
-    db_details = DBDetails.objects.filter(tag__in=tags)
 
-    context = {
-        'servers': servers, 
-        'db_details': db_details,
-        'tags': tags
-        }
+class DBDetails(models.Model):
+    dbname = models.CharField(max_length=100)
+    hostname = models.CharField(max_length=100)
+    port = models.IntegerField()
+    servicename = models.CharField(max_length=100)
+    tag = models.CharField(max_length=100)
 
-    return render(request, 'common/gwms.html',context)
+    def __str__(self):
+        return self.dbname
