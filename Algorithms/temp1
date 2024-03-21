@@ -1,82 +1,45 @@
-{% extends "common/base.html" %}
-{% block content %}
-{% load static %}   
+from django.shortcuts import render
+from .models import Server, DBDetails, PasswordVault
 
-<div class="grid_3 grid_5">
-    <h3>Password Vault</h3>
-    <div class="but_list">
-        <div class="bs-example bs-example-tabs" role="tabpanel" data-example-id="togglable-tabs">
-            <ul id="myTab" class="nav nav-tabs" role="tablist">
-                {% for tag in tags %}
-                <li role="presentation" {% if loop.first %}class="active"{% endif %}>
-                    <a href="#{{ tag }}" role="tab" data-toggle="tab" aria-controls="{{ tag }}" aria-expanded="{% if loop.first %}true{% else %}false{% endif %}">{{ tag }}</a>
-                </li>
-                {% endfor %}
-            </ul>
-            <div id="myTabContent" class="tab-content">
-                {% for tag in tags %}
-                <div role="tabpanel" class="tab-pane fade {% if loop.first %}in active{% endif %}" id="{{ tag }}" aria-labelledby="{{ tag }}-tab">
-                    <div class="panel panel-warning" data-widget="{&quot;draggable&quot;: &quot;false&quot;}" data-widget-static="">
-                        
-                        <div class="panel-body no-padding">
-                            <table class="table table-striped">
-                                <thead>
-                                    <tr class="warning">
-                                        <th>Details</th>
-                                        <th>Password</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    {% for pv in PasswordVault %}
-                                    {% if pv.tag == tag %}
-                                    <tr>
-                                        <td>{{ pv.username }}</td>
-                                        <td>
-                                            <div class="input-group">
-                                                <input type="password" class="form-control" id="password{{ forloop.counter }}" value="{{ pv.password }}" style="display: none;" readonly>
-                                                <div class="input-group-append">
-                                                    <button class="btn btn-outline-secondary" type="button" onclick="copyPassword('password{{ forloop.counter }}')">Copy</button>
-                                                </div>
-                                            </div>
-                                        </td>
-                                    </tr>
-                                    {% endif %}
-                                    {% endfor %}
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-                </div>
-                {% endfor %}
-            </div>
-        </div>
-    </div>
-</div>
+# Create your views here.
 
-<script>
-    document.addEventListener("DOMContentLoaded", function() {
-        var tabs = document.querySelectorAll('.nav-tabs li a');
-        tabs.forEach(function(tab) {
-            tab.addEventListener('click', function(event) {
-                event.preventDefault();
-                var tabContentId = this.getAttribute('href');
-                var tabContent = document.querySelector(tabContentId);
-                var activeTab = document.querySelector('.tab-pane.active');
-                if (activeTab) {
-                    activeTab.classList.remove('active');
-                }
-                tabContent.classList.add('active');
-            });
-        });
-    });
+def home(request):
+    context = {}
+    return render(request, 'common/home.html',context)
+
+def viewGWMS(request):
+    # Retrieve all Server instances
+    servers = Server.objects.all()
+    for i in servers:
+        print(i.tag)
+
+    #  Get unique tags and sort them in ascending order
+    tags = sorted(set(server.tag for server in servers))
+
+    # Query DBDetails based on the tag
+    db_details = DBDetails.objects.filter(tag__in=tags)
+
+    context = {
+        'servers': servers, 
+        'db_details': db_details,
+        'tags': tags
+        }
+
+    return render(request, 'common/gwms.html',context)
+
+
+def passwordvault(request):
+    # Retrieve all Server instances
+    Passwords = PasswordVault.objects.all()
     
-    function copyPassword(passwordId) {
-        var passwordField = document.getElementById(passwordId);
-        passwordField.select();
-        navigator.clipboard.writeText(passwordField.value);
-        alert('Password copied to clipboard!');
-    }
-</script>
+    #  Get unique tags and sort them in ascending order
+    tags = sorted(set(i.tag for i in Passwords))
 
+    
 
-{% endblock content %}
+    context = {
+        'PasswordVault': Passwords, 
+        'tags': tags
+        }
+
+    return render(request, 'common/PasswordVault.html',context)
