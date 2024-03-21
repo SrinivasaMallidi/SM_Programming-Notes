@@ -1,37 +1,27 @@
-from django.db import models
-
-class Server(models.Model):
-    name = models.CharField(max_length=100)
-    ip_address = models.CharField(max_length=100)
-    cluster_name = models.CharField(max_length=100)
-    tag = models.CharField(max_length=100)
-
-    def __str__(self):
-        return self.name
-
-class ApplicationUrl(models.Model):
-    url = models.URLField()
-    name = models.CharField(max_length=100)
-    server = models.ForeignKey(Server, on_delete=models.CASCADE, related_name='application_urls')
-
-    def __str__(self):
-        return self.url
+from django.contrib import admin
+from .models import Server, ApplicationUrl, DBDetails, PasswordVault
 
 
-class DBDetails(models.Model):
-    dbname = models.CharField(max_length=100)
-    hostname = models.CharField(max_length=100)
-    port = models.IntegerField()
-    servicename = models.CharField(max_length=100)
-    tag = models.CharField(max_length=100)
 
-    def __str__(self):
-        return self.dbname
+@admin.register(Server)
+class ServerAdmin(admin.ModelAdmin):
+    list_display = ('name', 'ip_address', 'cluster_name', 'tag')
+    list_display_links = ('name',)
 
-class PasswordVault(models.Model):
-    tag = models.CharField(max_length=100)
-    username = models.CharField(max_length=100)
-    password = models.CharField(max_length=100)  # You may want to consider using a more secure field like TextField with encryption
 
-    def __str__(self):
-        return self.tag
+@admin.register(ApplicationUrl)
+class ApplicationUrlAdmin(admin.ModelAdmin):
+    list_display = ('name','server')
+    list_display_links = ('name',)
+
+
+@admin.register(DBDetails)
+class DBDetailsAdmin(admin.ModelAdmin):
+    list_display = ('dbname','tag')
+    list_display_links = ('dbname',)
+
+
+@admin.register(PasswordVault)
+class PasswordVaultAdmin(admin.ModelAdmin):
+    list_display = ('username','tag')
+    list_display_links = ('username',)
