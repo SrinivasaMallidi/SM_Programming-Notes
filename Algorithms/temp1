@@ -1,45 +1,9 @@
-from django.shortcuts import render
-from .models import Server, DBDetails, PasswordVault
+from django.urls import path, include
 
-# Create your views here.
+from . import views
 
-def home(request):
-    context = {}
-    return render(request, 'common/home.html',context)
-
-def viewGWMS(request):
-    # Retrieve all Server instances
-    servers = Server.objects.all()
-    for i in servers:
-        print(i.tag)
-
-    #  Get unique tags and sort them in ascending order
-    tags = sorted(set(server.tag for server in servers))
-
-    # Query DBDetails based on the tag
-    db_details = DBDetails.objects.filter(tag__in=tags)
-
-    context = {
-        'servers': servers, 
-        'db_details': db_details,
-        'tags': tags
-        }
-
-    return render(request, 'common/gwms.html',context)
-
-
-def passwordvault(request):
-    # Retrieve all Server instances
-    Passwords = PasswordVault.objects.all()
-    
-    #  Get unique tags and sort them in ascending order
-    tags = sorted(set(i.tag for i in Passwords))
-
-    
-
-    context = {
-        'PasswordVault': Passwords, 
-        'tags': tags
-        }
-
-    return render(request, 'common/PasswordVault.html',context)
+urlpatterns = [
+    path('',views.home,name='common-home'),
+    path('gwms/',views.viewGWMS,name='common-view-gwms'),
+    path('passwordvault/',views.passwordvault,name='common-passwordvault'),
+]
