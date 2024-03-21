@@ -1,0 +1,89 @@
+{% extends "common/base.html" %}
+{% block content %}
+{% load static %}   
+
+<div class="grid_3 grid_5">
+    <h3>Tabs</h3>
+    <div class="but_list">
+        <div class="bs-example bs-example-tabs" role="tabpanel" data-example-id="togglable-tabs">
+            <ul id="myTab" class="nav nav-tabs" role="tablist">
+                {% for tag in tags %}
+                <li role="presentation" {% if loop.first %}class="active"{% endif %}>
+                    <a href="#{{ tag }}" role="tab" data-toggle="tab" aria-controls="{{ tag }}" aria-expanded="{% if loop.first %}true{% else %}false{% endif %}">{{ tag }}</a>
+                </li>
+                {% endfor %}
+            </ul>
+            <div id="myTabContent" class="tab-content">
+                {% for tag in tags %}
+                <div role="tabpanel" class="tab-pane fade {% if loop.first %}in active{% endif %}" id="{{ tag }}" aria-labelledby="{{ tag }}-tab">
+                    <div class="panel panel-warning" data-widget="{&quot;draggable&quot;: &quot;false&quot;}" data-widget-static="">
+                        <div class="panel-heading">
+                            <h2>{{ tag }}</h2>
+                            <div class="panel-ctrls" data-actions-container="" data-action-collapse="{&quot;target&quot;: &quot;.panel-body&quot;}"><span class="button-icon has-bg"><i class="ti ti-angle-down"></i></span></div>
+                        </div>
+                        <div class="panel-body no-padding">
+                            <table class="table table-striped">
+                                <thead>
+                                    <tr class="warning">
+                                        <th>Name</th>
+                                        <th>IP Address</th>
+                                        <th>Cluster Name</th>
+                                        <th>URLS</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for server in servers %}
+                                    {% if server.tag == tag %}
+                                    <tr>
+                                        <td>{{ server.name }}.sga-res.com</td>
+                                        <td>{{ server.ip_address }}</td>
+                                        <td>{{ server.cluster_name }}</td>
+                                        <td>
+                                            <h5>
+                                                {% for url in server.application_urls.all %}
+                                                <a href="{{ url.url }}" class="label btn_6 label-primary" target="_blank">{{ url.name }}</a>
+                                                {% endfor %}
+                                            </h5>
+                                        </td>
+                                    </tr>
+                                    {% endif %}
+                                    {% endfor %}
+                                    
+                                    {% for db_detail in db_details %}
+                                    {% if db_detail.tag == tag %}
+                                    <tr>
+                                        <td colspan="3">{{ db_detail.hostname }}:{{ db_detail.port }}/{{ db_detail.servicename }}</td>
+                                    </tr>
+                                    {% endif %}
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        var tabs = document.querySelectorAll('.nav-tabs li a');
+        tabs.forEach(function(tab) {
+            tab.addEventListener('click', function(event) {
+                event.preventDefault();
+                var tabContentId = this.getAttribute('href');
+                var tabContent = document.querySelector(tabContentId);
+                var activeTab = document.querySelector('.tab-pane.active');
+                if (activeTab) {
+                    activeTab.classList.remove('active');
+                }
+                tabContent.classList.add('active');
+            });
+        });
+    });
+</script>
+
+
+{% endblock content %}
