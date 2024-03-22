@@ -1,112 +1,70 @@
-{% extends "common/base.html" %}
-{% block content %}
-{% load static %}   
+from django.shortcuts import render, redirect
+from django.http import HttpResponse
+from .models import Server, DBDetails, PasswordVault
+import subprocess
 
-<div class="grid_3 grid_5">
-    <h3>Maximo server details and application urls</h3>
-    <div class="but_list">
-        <div class="bs-example bs-example-tabs" role="tabpanel" data-example-id="togglable-tabs">
-            <ul id="myTab" class="nav nav-tabs" role="tablist">
-                {% for tag in tags %}
-                <li role="presentation" {% if loop.first %}class="active"{% endif %}>
-                    <a href="#{{ tag }}" role="tab" data-toggle="tab" aria-controls="{{ tag }}" aria-expanded="{% if loop.first %}true{% else %}false{% endif %}">{{ tag }}</a>
-                </li>
-                {% endfor %}
-            </ul>
-            <div id="myTabContent" class="tab-content">
-                {% for tag in tags %}
-                <div role="tabpanel" class="tab-pane fade {% if loop.first %}in active{% endif %}" id="{{ tag }}" aria-labelledby="{{ tag }}-tab">
-                    <div class="panel panel-warning" data-widget="{&quot;draggable&quot;: &quot;false&quot;}" data-widget-static="">
-                        <div class="panel-heading">
-                            <h2>{{ tag }}</h2>
-                            <div class="panel-ctrls" data-actions-container="" data-action-collapse="{&quot;target&quot;: &quot;.panel-body&quot;}"><span class="button-icon has-bg"><i class="ti ti-angle-down"></i></span></div>
-                        </div>
-                        <div class="panel-body no-padding">
-                            <form id="puttyForm" method="post" action="{% url 'common-openputty' %}">
-                                {% csrf_token %}
-                                <table class="table table-striped">
-                                    <thead>
-                                        <tr class="warning">
-                                            <th>Name</th>
-                                            <th>IP Address</th>
-                                            <th>Cluster Name</th>
-                                            <th>URLS</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        {% for server in servers %}
-                                        {% if server.tag == tag %}
-                                        <tr>
-                                            
-                                            <td>
-                                                <input type="checkbox" name="selected_servers" value="{{ server.id }}">
-                                                {{ server.name }}.sga-res.com
-                                                <button class="btn btn_5 btn-lg btn-link" onclick="copyText('{{ server.name }}.sga-res.com')">Copy</button>
-                                            </td>
-                                            <td>{{ server.ip_address }}</td>
-                                            <td>{{ server.cluster_name }}</td>
-                                            <td>
-                                                <h6>
-                                                    {% for url in server.application_urls.all %}
-                                                    <a href="{{ url.url }}" class="label btn_6 label-primary" target="_blank">{{ url.name }}</a>
-                                                    {% endfor %}
-                                                </h6>
-                                            </td>
-                                        </tr>
-                                        {% endif %}
-                                        {% endfor %}
-                                        
-                                        {% for db_detail in db_details %}
-                                        {% if db_detail.tag == tag %}
-                                        <tr>
-                                            <td>
-                                                <input type="checkbox" name="selected_servers" value="{{ db_detail.id }}">
-                                                {{ db_detail.hostname }}.sga-res.com
-                                                <button class="btn btn_5 btn-lg btn-link" onclick="copyText('{{db_detail.hostname}}.sga-res.com')">Copy</button></td>
-                                            <td colspan="3"><b>Port:</b> {{ db_detail.port }}, <b>Service Name:</b> {{ db_detail.servicename }}</td>
-                                        </tr>
-                                        {% endif %}
-                                        {% endfor %}
-                                    </tbody>
-                                </table>
-                            <button type="submit" class="btn btn-primary">Open in PuTTY</button>
-                        </form>
-                        </div>
-                    </div>
-                </div>
-                {% endfor %}
-            </div>
-        </div>
-    </div>
-</div>
+# Create your views here.
 
-<script>
-    document.addEventListener("DOMContentLoaded", function() {
-        var tabs = document.querySelectorAll('.nav-tabs li a');
-        tabs.forEach(function(tab) {
-            tab.addEventListener('click', function(event) {
-                event.preventDefault();
-                var tabContentId = this.getAttribute('href');
-                var tabContent = document.querySelector(tabContentId);
-                var activeTab = document.querySelector('.tab-pane.active');
-                if (activeTab) {
-                    activeTab.classList.remove('active');
-                }
-                tabContent.classList.add('active');
-            });
-        });
-    });
+def home(request):
+    context = {}
+    return render(request, 'common/home.html',context)
 
-    function copyText(text) {
-        navigator.clipboard.writeText(text)
-            .then(() => {
-                console.log('Text copied to clipboard:', text);
-            })
-            .catch((error) => {
-                console.error('Error copying text to clipboard:', error);
-            });
-    }
-</script>
+def viewGWMS(request):
+    # Retrieve all Server instances
+    servers = Server.objects.all()
+    for i in servers:
+        print(i.tag)
+
+    #  Get unique tags and sort them in ascending order
+    tags = sorted(set(server.tag for server in servers))
+
+    # Query DBDetails based on the tag
+    db_details = DBDetails.objects.filter(tag__in=tags)
+
+    context = {
+        'servers': servers, 
+        'db_details': db_details,
+        'tags': tags
+        }
+
+    return render(request, 'common/gwms.html',context)
 
 
-{% endblock content %}
+def passwordvault(request):
+    # Retrieve all Server instances
+    Passwords = PasswordVault.objects.all()
+    
+    #  Get unique tags and sort them in ascending order
+    tags = sorted(set(i.tag for i in Passwords))
+
+    
+
+    context = {
+        'PasswordVault': Passwords, 
+        'tags': tags
+        }
+
+    return render(request, 'common/PasswordVault.html',context)
+
+
+def open_putty(request):
+    if request.method == 'POST':
+        selected_servers = request.POST.getlist('selected_servers')
+        servers = Server.objects.filter(id__in=selected_servers)
+        for server in servers:
+            open_putty_for_server(server.ip_address)
+        dbservers = DBDetails.objects.filter(id__in=selected_servers)
+        for server in dbservers:
+            open_putty_for_server(str(server.hostname)+'.sga-res.com')
+        return redirect('common-view-gwms')
+    else:
+        return HttpResponse('Invalid request')
+
+def open_putty_for_server(hostname):
+    print(hostname)
+    putty_path = r'C:\Users\SM\Documents\putty.exe'
+    username = 'your_username'  # Replace with your PuTTY username
+    port = 22  # Replace with your PuTTY port
+    putty_command = f'{putty_path} -ssh {username}@{hostname} -P {port}'
+    subprocess.Popen(putty_command, shell=True)
+
