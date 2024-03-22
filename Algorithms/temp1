@@ -12,9 +12,6 @@ def home(request):
 def viewGWMS(request):
     # Retrieve all Server instances
     servers = Server.objects.all()
-    for i in servers:
-        print(i.tag)
-
     #  Get unique tags and sort them in ascending order
     tags = sorted(set(server.tag for server in servers))
 
@@ -47,38 +44,45 @@ def passwordvault(request):
     return render(request, 'common/PasswordVault.html',context)
 
 
-def open_putty(request):
+def openServer(request):
     if request.method == 'POST':
+        action = request.POST.get('action')
         selected_servers = request.POST.getlist('selected_servers')
-        for server in selected_servers:
-            open_putty_for_server(server)
+        if action == 'open_putty':
+            for server in selected_servers:
+                open_putty_for_server(server)
+        elif action == 'open_winscp':
+            username = 'Srinivasa.Mallidi-b@sga-res.com'
+            print(selected_servers)
+            try:
+                # Retrieve the PasswordVault object for the given username
+                password_entry = PasswordVault.objects.get(username=username)
+                password = password_entry.password
+                for server in selected_servers:
+                    open_putty_for_server(server,username,password)
+            except PasswordVault.DoesNotExist:
+                print(f"Password not found for username: {username}")
         return redirect('common-view-gwms')
     else:
         return HttpResponse('Invalid request')
 
+
 def open_putty_for_server(hostname):
-    try:
-        # Retrieve the PasswordVault object for the given username
-        password_entry = PasswordVault.objects.get(username=username)
-        password = password_entry.password
-        
-        # Proceed to open PuTTY with the retrieved password
-        print(hostname)
-        putty_path = r'C:\Users\Srinivasa.Mallidi\Documents\Softwares\PuTTYPortable\App\putty\PUTTY.exe'
-        port = 22  # Replace with your PuTTY port
+    print(hostname)
+    putty_path = r'C:\Users\SM\Documents\putty.exe'
+    username = 'your_username'  # Replace with your PuTTY username
+    port = 22  # Replace with your PuTTY port
+    putty_command = f'{putty_path} -ssh {username}@{hostname} -P {port}'
+    subprocess.Popen(putty_command, shell=True)
 
-        # Construct the command for expect
-        expect_script = f'''
-            spawn {putty_path} -ssh {username}@{hostname} -P {port}
-            expect "password:"
-            send "{password}\\r"
-            interact
-        '''
 
-        # Execute the expect script
-        subprocess.Popen(['expect', '-c', expect_script])
+def open_winscp_for_server(hostname, username, password):
+    winscp_path = r'C:\Program Files (x86)\WinSCP\WinSCP.exe'  # Adjust the path as per your WinSCP installation
+    protocol = 'sftp'  # Adjust the protocol as needed
+    port = 22  # Adjust the port as needed
 
-    except PasswordVault.DoesNotExist:
-        print(f"Password not found for username: {username}")
+    # Construct the command to open WinSCP with the specified parameters
+    winscp_command = f'{winscp_path} /command "open {protocol}://{username}:{password}@{hostname}:{port}"'
 
-        
+    # Open WinSCP using subprocess
+    subprocess.Popen(winscp_command, shell=True)
