@@ -1,10 +1,84 @@
-from django.urls import path, include
+from django.shortcuts import render, redirect
+from django.http import HttpResponse
+from .models import Server, DBDetails, PasswordVault
+import subprocess
 
-from . import views
+# Create your views here.
 
-urlpatterns = [
-    path('',views.home,name='common-home'),
-    path('gwms/',views.viewGWMS,name='common-view-gwms'),
-    path('passwordvault/',views.passwordvault,name='common-passwordvault'),
-    path('open_putty/',views.open_putty,name='common-openputty'),
-]
+def home(request):
+    context = {}
+    return render(request, 'common/home.html',context)
+
+def viewGWMS(request):
+    # Retrieve all Server instances
+    servers = Server.objects.all()
+    for i in servers:
+        print(i.tag)
+
+    #  Get unique tags and sort them in ascending order
+    tags = sorted(set(server.tag for server in servers))
+
+    # Query DBDetails based on the tag
+    db_details = DBDetails.objects.filter(tag__in=tags)
+
+    context = {
+        'servers': servers, 
+        'db_details': db_details,
+        'tags': tags
+        }
+
+    return render(request, 'common/gwms.html',context)
+
+
+def passwordvault(request):
+    # Retrieve all Server instances
+    Passwords = PasswordVault.objects.all()
+    
+    #  Get unique tags and sort them in ascending order
+    tags = sorted(set(i.tag for i in Passwords))
+
+    
+
+    context = {
+        'PasswordVault': Passwords, 
+        'tags': tags
+        }
+
+    return render(request, 'common/PasswordVault.html',context)
+
+
+def open_putty(request):
+    if request.method == 'POST':
+        selected_servers = request.POST.getlist('selected_servers')
+        for server in selected_servers:
+            open_putty_for_server(server)
+        return redirect('common-view-gwms')
+    else:
+        return HttpResponse('Invalid request')
+
+def open_putty_for_server(hostname):
+    try:
+        # Retrieve the PasswordVault object for the given username
+        password_entry = PasswordVault.objects.get(username=username)
+        password = password_entry.password
+        
+        # Proceed to open PuTTY with the retrieved password
+        print(hostname)
+        putty_path = r'C:\Users\Srinivasa.Mallidi\Documents\Softwares\PuTTYPortable\App\putty\PUTTY.exe'
+        port = 22  # Replace with your PuTTY port
+
+        # Construct the command for expect
+        expect_script = f'''
+            spawn {putty_path} -ssh {username}@{hostname} -P {port}
+            expect "password:"
+            send "{password}\\r"
+            interact
+        '''
+
+        # Execute the expect script
+        subprocess.Popen(['expect', '-c', expect_script])
+
+    except PasswordVault.DoesNotExist:
+        print(f"Password not found for username: {username}")
+
+        
