@@ -1,70 +1,10 @@
-from django.shortcuts import render, redirect
-from django.http import HttpResponse
-from .models import Server, DBDetails, PasswordVault
-import subprocess
+from django.urls import path, include
 
-# Create your views here.
+from . import views
 
-def home(request):
-    context = {}
-    return render(request, 'common/home.html',context)
-
-def viewGWMS(request):
-    # Retrieve all Server instances
-    servers = Server.objects.all()
-    for i in servers:
-        print(i.tag)
-
-    #  Get unique tags and sort them in ascending order
-    tags = sorted(set(server.tag for server in servers))
-
-    # Query DBDetails based on the tag
-    db_details = DBDetails.objects.filter(tag__in=tags)
-
-    context = {
-        'servers': servers, 
-        'db_details': db_details,
-        'tags': tags
-        }
-
-    return render(request, 'common/gwms.html',context)
-
-
-def passwordvault(request):
-    # Retrieve all Server instances
-    Passwords = PasswordVault.objects.all()
-    
-    #  Get unique tags and sort them in ascending order
-    tags = sorted(set(i.tag for i in Passwords))
-
-    
-
-    context = {
-        'PasswordVault': Passwords, 
-        'tags': tags
-        }
-
-    return render(request, 'common/PasswordVault.html',context)
-
-
-def open_putty(request):
-    if request.method == 'POST':
-        selected_servers = request.POST.getlist('selected_servers')
-        servers = Server.objects.filter(id__in=selected_servers)
-        for server in servers:
-            open_putty_for_server(server.ip_address)
-        dbservers = DBDetails.objects.filter(id__in=selected_servers)
-        for server in dbservers:
-            open_putty_for_server(str(server.hostname)+'.sga-res.com')
-        return redirect('common-view-gwms')
-    else:
-        return HttpResponse('Invalid request')
-
-def open_putty_for_server(hostname):
-    print(hostname)
-    putty_path = r'C:\Users\SM\Documents\putty.exe'
-    username = 'your_username'  # Replace with your PuTTY username
-    port = 22  # Replace with your PuTTY port
-    putty_command = f'{putty_path} -ssh {username}@{hostname} -P {port}'
-    subprocess.Popen(putty_command, shell=True)
-
+urlpatterns = [
+    path('',views.home,name='common-home'),
+    path('gwms/',views.viewGWMS,name='common-view-gwms'),
+    path('passwordvault/',views.passwordvault,name='common-passwordvault'),
+    path('open_putty/',views.open_putty,name='common-openputty'),
+]
