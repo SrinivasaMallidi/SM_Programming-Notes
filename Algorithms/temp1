@@ -1,22 +1,17 @@
-from django.db import models
+from django.contrib import admin
 
-# Create your models here.
+# Register your models here.
+from .models import Vulnerability, Proof
 
-class Vulnerability(models.Model):
-    VITNUMBER = models.CharField(max_length=100)
-    CONFIGURATION_ITEM = models.CharField(max_length=100)
-    SUMMARY = models.CharField(max_length=255)
-    SOLUTION = models.TextField()
-    SEVERITY = models.CharField(max_length=50)
-    MONTH = models.DateField()
-    STATE = models.CharField(max_length=50)
 
-    def __str__(self):
-        return f"{self.VITNUMBER}: {self.SUMMARY}"
 
-class Proof(models.Model):
-    vulnerability = models.ForeignKey(Vulnerability, on_delete=models.CASCADE, related_name='proofs')
-    PROOF = models.CharField(max_length=255)
+@admin.register(Vulnerability)
+class VulnerabilityAdmin(admin.ModelAdmin):
+    list_display = ('VITNUMBER', 'CONFIGURATION_ITEM', 'SEVERITY', 'MONTH')
+    list_display_links = ('VITNUMBER',)
 
-    def __str__(self):
-        return f"{self.vulnerability.VITNUMBER} - Proof {self.pk}"
+@admin.register(Proof)
+class ProofAdmin(admin.ModelAdmin):
+    list_display = ('PROOF',)
+    list_display_links = ('PROOF',)
+
