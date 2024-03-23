@@ -1,1 +1,33 @@
-33
+{% extends "common/base.html" %}
+{% block content %}
+<h2>Vulnerability Details</h2>
+<div class="table-responsive">
+    <table class="table table-bordered">
+      <thead>
+        <tr>
+          <th>VITNUMBER</th>
+          <th>Configuration Item</th>
+          <th>Summary</th>
+          <th>Solution</th>
+          <th>Severity</th>
+          <th>Month</th>
+          <th>State</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for vulnerability in vulnerabilities %}
+        <tr>
+            <th scope="row">{{ vulnerability.VITNUMBER }}</th>
+            <td>{{ vulnerability.CONFIGURATION_ITEM }}</td>
+            <td>{{ vulnerability.SUMMARY }}</td>
+            <td>{{ vulnerability.SOLUTION }}</td>
+            <td>{{ vulnerability.SEVERITY }}</td>
+            <td>{{ vulnerability.MONTH }}</td>
+            <td>{{ vulnerability.STATE }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+</div><!-- /.table-responsive -->
+
+{% endblock %}
