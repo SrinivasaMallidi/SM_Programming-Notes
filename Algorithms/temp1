@@ -1,10 +1,113 @@
-from django.urls import path, include
+{% extends "common/base.html" %}
+{% block content %}
+{% load static %}   
 
-from . import views
 
-urlpatterns = [
-    path('',views.home,name='common-home'),
-    path('gwms/',views.viewGWMS,name='common-view-gwms'),
-    path('passwordvault/',views.passwordvault,name='common-passwordvault'),
-    path('open_in_app/',views.openServer,name='common-openinapp'),
-]
+<form action="{% url 'upload_excel' %}" method="post" enctype="multipart/form-data">
+    {% csrf_token %}
+    <div class="form-group">
+        <label for="exampleInputFile">Upload Vulnerability Report</label>
+        <input type="file" id="excel_file" name="excel_file">
+        <p class="help-block">Please upload the excel in below formate</p>
+        <table class="table table-striped">
+            <tr>
+                <th>VITNUMBER</th>
+                <th>CONFIGURATION ITEM</th>
+                <th>SUMMARY</th>
+                <th>SOLUTION</th>
+                <th>PROOF</th>
+                <th>SEVERITY</th>
+                <th>MONTH</th>
+                <th>STATE</th>
+            </tr>
+        </table>
+    </div>
+    <button type="submit">Upload</button>
+</form>
+
+<script>
+    function showProofs(vitnumber) {
+        fetch(`/vulnerability/get-proofs/?vitnumber=${vitnumber}`)
+            .then(response => response.json())
+            .then(data => {
+                const proofsModal = document.getElementById('proofsModal');
+                const proofsModalBody = proofsModal.querySelector('.modal-body');
+                proofsModalBody.innerHTML = '';
+
+                const proofsList = document.createElement('ol');  // Create ordered list
+                data.forEach(proof => {
+                    const proofItem = document.createElement('li');  // Create list item
+                    proofItem.textContent = proof.proof;  // Adjust 'proof_field' as per your Proof model
+                    proofsList.appendChild(proofItem);  // Append list item to ordered list
+                });
+                proofsModalBody.appendChild(proofsList);  // Append ordered list to modal body
+
+                $('#proofsModal').modal('show');
+            })
+            .catch(error => console.error('Error fetching proofs:', error));
+    }
+
+    function togglePanelBody(heading) {
+        const panelBody = heading.nextElementSibling;
+        panelBody.style.display = panelBody.style.display === 'none' ? 'block' : 'none';
+    }
+</script>
+
+    {% for vitnumber, vulnerabilities in vitnumber_groups.items %}
+    <div class="panel panel-warning" data-widget="{&quot;draggable&quot;: &quot;false&quot;}" data-widget-static="">
+
+    <div class="panel-heading" onclick="togglePanelBody(this)">
+        <h2>{{ vitnumber }}</h2>
+        <div class="panel-ctrls" data-actions-container="" data-action-collapse="{&quot;target&quot;: &quot;.panel-body&quot;}"><span class="button-icon has-bg"><i class="ti ti-angle-down"></i></span></div>
+    </div>
+    <div class="panel-body no-padding" style="display: none;">
+    <table class="table table-striped">
+      <thead>
+        <tr>
+            <th>CONFIGURATION ITEM</th>
+            <th>SUMMARY</th>
+            <th>SOLUTION</th>
+            <th>SEVERITY</th>
+            <th>MONTH</th>
+            <th>STATE</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for vulnerability in vulnerabilities %}
+            <tr class="active">
+                <th scope="row">{{ vulnerability.CONFIGURATION_ITEM }}</th>
+                <td>{{ vulnerability.SUMMARY }}</td>
+                <td>{{ vulnerability.SOLUTION }}</td>
+                <td>{{ vulnerability.SEVERITY }}</td>
+                <td>{{ vulnerability.MONTH }}</td>
+                <td>{{ vulnerability.STATE }}</td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+    <button type="submit"   class="btn btn-info" onclick="showProofs('{{ vitnumber }}')">Show Proofs</button>
+                           
+    </div>
+   
+            <!-- Modal for showing proofs -->
+        <div class="modal fade" id="proofsModal" tabindex="-1" role="dialog" aria-labelledby="proofsModalLabel" aria-hidden="true">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="proofsModalLabel">Proofs</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <!-- Proofs will be displayed here -->
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+</div>
+{% endfor %}
+{% endblock content %}
