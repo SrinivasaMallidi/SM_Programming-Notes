@@ -1,33 +1,51 @@
 {% extends "common/base.html" %}
 {% block content %}
-<h2>Vulnerability Details</h2>
-<div class="table-responsive">
+{% load static %}   
+
+
+<form action="{% url 'upload_excel' %}" method="post" enctype="multipart/form-data">
+    {% csrf_token %}
+    <div class="form-group">
+        <label for="exampleInputFile">Upload Vulnerability Report</label>
+        <input type="file" id="excel_file" name="excel_file">
+        <p class="help-block">Please upload the excel in below formate</p>
+        <table class="table table-striped">
+            <tr>
+                <th>VITNUMBER</th>
+                <th>CONFIGURATION ITEM</th>
+                <th>SUMMARY</th>
+                <th>SOLUTION</th>
+                <th>PROOF</th>
+                <th>SEVERITY</th>
+                <th>MONTH</th>
+                <th>STATE</th>
+            </tr>
+        </table>
+    </div>
+    <button type="submit">Upload</button>
+</form>
+<div class="bs-example4" data-example-id="contextual-table">
     <table class="table table-bordered">
       <thead>
         <tr>
-          <th>VITNUMBER</th>
-          <th>Configuration Item</th>
-          <th>Summary</th>
-          <th>Solution</th>
-          <th>Severity</th>
-          <th>Month</th>
-          <th>State</th>
+            <th>Vulnerability</th>
+            <th>No. of Records</th>
+            <th>Months</th>
+            <th>State</th>
         </tr>
       </thead>
       <tbody>
-        {% for vulnerability in vulnerabilities %}
-        <tr>
-            <th scope="row">{{ vulnerability.VITNUMBER }}</th>
-            <td>{{ vulnerability.CONFIGURATION_ITEM }}</td>
-            <td>{{ vulnerability.SUMMARY }}</td>
-            <td>{{ vulnerability.SOLUTION }}</td>
-            <td>{{ vulnerability.SEVERITY }}</td>
-            <td>{{ vulnerability.MONTH }}</td>
-            <td>{{ vulnerability.STATE }}</td>
-        </tr>
+        {% for vulnerability in vulnerability_summary %}
+            <tr class="info">
+                <th scope="row"> <a href="{% url 'vulnerability_details' vulnerability.0 %}">{{ vulnerability.0 }}</a></th>
+                <td>{{ vulnerability.1 }}</td>
+                <td>{{ vulnerability.2 }}</td>
+                <td>{{ vulnerability.3 }}</td>                
+            </tr>
         {% endfor %}
       </tbody>
     </table>
-</div><!-- /.table-responsive -->
+   </div>
 
-{% endblock %}
+
+{% endblock content %}
