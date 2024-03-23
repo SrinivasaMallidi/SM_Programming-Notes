@@ -1,9 +1,1 @@
-from django.urls import path, include
-
-from . import views
-
-urlpatterns = [
-    path('',views.home,name='vulnerability-home'),
-    path('upload-excel/', views.upload_excel, name='upload_excel'),
-    path('get-proofs/', views.get_proofs, name='get_proofs'),
-]
+33
