@@ -1,1 +1,16 @@
-abc
+import subprocess
+
+def open_sql_developer_connection(hostname, port, servicename, username, password):
+    try:
+        subprocess.run(['sqldeveloper', '-S', f"{username}/{password}@{hostname}:{port}/{servicename}"], check=True)
+    except subprocess.CalledProcessError as e:
+        print(f"Error: {e}")
+
+# Example usage:
+hostname = "example.com"
+port = "1521"
+servicename = "ORCL"
+username = "your_username"
+password = "your_password"
+
+open_sql_developer_connection(hostname, port, servicename, username, password)
