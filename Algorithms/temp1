@@ -1,1 +1,2 @@
-rrr
+
+    path('open/<str:application_name>/', views.open_application, name='open_application'),
