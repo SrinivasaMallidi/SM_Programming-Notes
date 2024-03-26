@@ -1,20 +1,19 @@
-Topic Description: Equipment Condition Monitoring
+Topic Description: Equipment Run Hours
 
 Requirements:
 
-Real-time monitoring of equipment sensors data.
-Detection of abnormal observations from sensor data.
-Automatic generation of work requests in Maximo Application based on abnormal observations.
-Seamless integration with Maximo for work request creation and routing.
+Accurate recording of equipment run hours.
+Generation of preventive maintenance (PM) work orders based on actual equipment run hours.
+Integration with PI (Process Information) system to retrieve equipment run hour data.
+Automation of PM work order generation based on actual equipment run hours.
 Technologies (Software/Hardware):
 
-Sensor data acquisition system.
-Data processing and analysis software.
-Integration middleware for communication with Maximo.
-Maximo Application for work request management.
+PI system for capturing equipment run hour data.
+Integration middleware for communication between PI system and maintenance system (e.g., Maximo).
+Maintenance management software (e.g., Maximo) for PM work order generation and management.
 Business Benefits:
 
-Proactive maintenance: Early detection of equipment abnormalities allows for proactive maintenance actions, reducing downtime and preventing potential failures.
-Efficiency: Automation of work request generation streamlines the maintenance process, eliminating manual intervention and reducing response time.
-Cost savings: By addressing issues before they escalate, organizations can avoid costly equipment breakdowns and unplanned downtime.
-Improved asset performance: Continuous monitoring and timely maintenance contribute to improved overall asset performance and longevity.
+Improved maintenance scheduling: PM work orders are generated based on actual equipment usage, ensuring maintenance tasks are performed when needed and not unnecessarily.
+Increased equipment reliability: Regular maintenance based on actual run hours reduces the risk of unexpected breakdowns and prolongs equipment lifespan.
+Cost savings: Eliminating unnecessary PM work orders reduces maintenance costs associated with labor, parts, and downtime.
+Enhanced asset performance: Maintenance activities aligned with actual equipment usage optimize asset performance and availability.
