@@ -1,2 +1,20 @@
+Topic Description: Equipment Condition Monitoring
 
-    path('open/<str:application_name>/', views.open_application, name='open_application'),
+Requirements:
+
+Real-time monitoring of equipment sensors data.
+Detection of abnormal observations from sensor data.
+Automatic generation of work requests in Maximo Application based on abnormal observations.
+Seamless integration with Maximo for work request creation and routing.
+Technologies (Software/Hardware):
+
+Sensor data acquisition system.
+Data processing and analysis software.
+Integration middleware for communication with Maximo.
+Maximo Application for work request management.
+Business Benefits:
+
+Proactive maintenance: Early detection of equipment abnormalities allows for proactive maintenance actions, reducing downtime and preventing potential failures.
+Efficiency: Automation of work request generation streamlines the maintenance process, eliminating manual intervention and reducing response time.
+Cost savings: By addressing issues before they escalate, organizations can avoid costly equipment breakdowns and unplanned downtime.
+Improved asset performance: Continuous monitoring and timely maintenance contribute to improved overall asset performance and longevity.
