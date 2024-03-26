@@ -1,19 +1,20 @@
-Topic Description: Business Process Reengineering - Integrated Asset Performance Management
+Topic Description: Business Process Reengineering - Integrated Roster Management
 
 Requirements:
 
-Integration between Asset Management System (AMS) and Integrated Management System (IMS).
-Automated synchronization process (interface) between IMS and AMS to exchange critical asset and maintenance data.
-Transfer of data from IMS to AMS including critical locations, assets, preventive maintenance (PM) tasks, and work order (WO) information.
-Transfer of data from AMS to IMS including functional locations, equipment, inspection tasks, and work order history.
+Centralized storage of user roster details.
+Automated synchronization of roster details between Maximo and Primavera.
+Elimination of manual tasks involved in maintaining rosters in Excel or other reports and sharing via SharePoint.
+Integration between Maximo and Primavera through Maxavera for seamless data exchange.
 Technologies (Software/Hardware):
 
-Integration middleware for data exchange between AMS and IMS.
-Asset management software (e.g., Maximo) for managing maintenance activities and work orders.
-Integrated management software (e.g., Meridium) for performance monitoring and analysis.
+Maximo for storing and managing user roster details.
+Primavera for project management and scheduling.
+Maxavera middleware for integrating Maximo and Primavera.
+SharePoint for document sharing and collaboration (phased out in the new solution).
 Business Benefits:
 
-Enhanced decision-making: Integration of asset performance data from IMS into AMS provides a holistic view of asset health, enabling data-driven decision-making.
-Improved asset reliability: Access to critical asset information and maintenance tasks from IMS allows for proactive maintenance planning and optimization of asset reliability.
-Streamlined processes: Automated synchronization between AMS and IMS streamlines data exchange processes, reducing manual effort and minimizing errors.
-Increased efficiency: Integration of functional location and equipment data from AMS into IMS improves the accuracy of performance monitoring and analysis, leading to more efficient asset management practices.
+Increased efficiency: Automation of roster data synchronization reduces manual effort and minimizes the risk of errors associated with manual data entry.
+Improved data accuracy: Centralized storage of roster details in Maximo ensures data consistency and integrity, eliminating discrepancies that may arise from using multiple sources.
+Streamlined processes: Integration between Maximo and Primavera streamlines the flow of information, enabling seamless communication and collaboration between project management and maintenance teams.
+Cost savings: By eliminating the need for a dedicated roster admin and reducing manual tasks, the organization saves time and resources, resulting in cost efficiencies.
