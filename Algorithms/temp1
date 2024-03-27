@@ -1,12 +1,49 @@
-from django.urls import path, include
+# Define function to check date within a time range
+def check_date_within_range(server_date, server_timezone):
+    current_datetime = datetime.now()
+    target_datetime = server_date.replace(tzinfo=None)
 
-from . import views
+    # Convert server datetime to local timezone
+    if server_timezone == "AEST":
+        target_datetime -= timedelta(hours=10)  # Adjust to AEST
+    elif server_timezone == "CST":
+        target_datetime -= timedelta(hours=6)   # Adjust to CST
 
-urlpatterns = [
-    path('',views.home,name='common-home'),
-    path('gwms/',views.viewGWMS,name='common-view-gwms'),
-    path('passwordvault/',views.passwordvault,name='common-passwordvault'),
-    path('open_in_app/',views.openServer,name='common-openinapp'),
-    path('open/<str:application_name>/', views.open_application, name='open_application'),
-    path('checkProdServerDates', views.checkProdServerDates, name='common-checkproddates'),
-]
+    # Check if difference is within 30 minutes
+    return abs(current_datetime - target_datetime) <= timedelta(minutes=30)
+
+
+def checkProdServerDates(request):
+    servers = [
+        {"hostname": "server1.example.com", "timezone": "AEST"},
+        {"hostname": "server2.example.com", "timezone": "AEST"},
+        {"hostname": "server3.example.com", "timezone": "AEST"},
+        {"hostname": "server4.example.com", "timezone": "CST"},
+        {"hostname": "server5.example.com", "timezone": "CST"},
+        {"hostname": "server6.example.com", "timezone": "CST"}
+    ]
+
+    # Connect to servers and execute date command
+    output_file_name = datetime.now().strftime("%Y-%m-%d_%H-%M-%S_servers.txt")
+    with open(output_file_name, "w") as output_file:
+        for server in servers:
+            try:
+                ssh = paramiko.SSHClient()
+                ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
+                ssh.connect(server["hostname"], username="your_username", password="your_password")
+                stdin, stdout, stderr = ssh.exec_command("date")
+                server_date = datetime.strptime(stdout.read().decode().strip(), "%a %b %d %H:%M:%S %Z %Y")
+                if check_date_within_range(server_date, server["timezone"]):
+                    result = f"Date on {server['hostname']} is within +/- 30 minutes of {server['timezone']} timezone."
+                else:
+                    result = f"Date on {server['hostname']} is NOT within +/- 30 minutes of {server['timezone']} timezone."
+                print(result)
+                output_file.write(result + "\n")
+                ssh.close()
+            except Exception as e:
+                error_msg = f"Failed to connect to {server['hostname']}: {e}"
+                print(error_msg)
+                output_file.write(error_msg + "\n")
+
+    # Return a response indicating the status of the operation
+    return redirect('common-home')
