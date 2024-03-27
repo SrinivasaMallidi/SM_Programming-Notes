@@ -1,24 +1,103 @@
+<!--
+Author: W3layouts
+Author URL: http://w3layouts.com
+License: Creative Commons Attribution 3.0 Unported
+License URL: http://creativecommons.org/licenses/by/3.0/
+-->
 
-Let's structure the presentation for the "Business Process Reengineering - Integrated Asset Performance Management" case study:
+{% load static %}   
+<!DOCTYPE HTML>
+<html>
+<head>
+<title>Srinivasa Mallidi</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="keywords" content="Modern Responsive web template, Bootstrap Web Templates, Flat Web Templates, Andriod Compatible web template, 
+Smartphone Compatible web template, free webdesigns for Nokia, Samsung, LG, SonyErricsson, Motorola web design" />
+<script type="application/x-javascript"> addEventListener("load", function() { setTimeout(hideURLbar, 0); }, false); function hideURLbar(){ window.scrollTo(0,1); } </script>
+ <!-- Bootstrap Core CSS -->
+<link href="{% static 'css/bootstrap.min.css' %}" rel='stylesheet' type='text/css' />
+<!-- Custom CSS -->
+<link href="{% static 'css/style.css' %}" rel='stylesheet' type='text/css' />
+<!-- Graph CSS -->
+<link href="{% static 'css/lines.css' %}" rel='stylesheet' type='text/css' />
+<link href="{% static 'css/font-awesome.css' %}" rel="stylesheet"> 
+<!-- jQuery -->
+<script src="{% static 'js/jquery.min.js' %}"></script>
+<!----webfonts--->
+<link href='http://fonts.googleapis.com/css?family=Roboto:400,100,300,500,700,900' rel='stylesheet' type='text/css'>
+<!---//webfonts--->  
+<!-- Nav CSS -->
+<link href="{% static 'css/custom.css' %}" rel="stylesheet">
+<!-- Metis Menu Plugin JavaScript -->
+<script src="{% static 'js/metisMenu.min.js' %}"></script>
+<script src="{% static 'js/custom.js' %}"></script>
+<!-- Graph JavaScript -->
+<script src="{% static 'js/d3.v3.js' %}"></script>
+<script src="{% static 'js/rickshaw.js' %}"></script>
+</head>
+<body>
+<div id="wrapper">
+     <!-- Navigation -->
+        <nav class="top1 navbar navbar-default navbar-static-top" role="navigation" style="margin-bottom: 0">
+            <div class="navbar-header">
+                <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+                    <span class="sr-only">Toggle navigation</span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                </button>
+                <a class="navbar-brand" href="{% url 'common-home' %}">Srinivasa Mallidi</a>
+            </div>
 
-Topic Description: Business Process Reengineering - Integrated Asset Performance Management
-
-Requirements:
-
-Integration between Asset Management System (AMS) and Integrated Management System (IMS).
-Automated synchronization process (interface) between AMS and IMS to exchange critical asset and maintenance data.
-Transfer of data from IMS to AMS including critical locations, assets, preventive maintenance (PM) tasks, and work order (WO) information.
-Transfer of data from AMS to IMS including functional locations, equipment, inspection tasks, and work order history.
-Checkbox functionality in Maximo application to trigger automatic synchronization of data to Meridium when checked.
-Technologies (Software/Hardware):
-
-Integration middleware for data exchange between AMS and IMS.
-Asset management software (e.g., Maximo) for managing maintenance activities and work orders.
-Integrated management software (e.g., Meridium) for performance monitoring and analysis.
-Business Benefits:
-
-Enhanced decision-making: Integration of asset performance data from IMS into AMS provides a holistic view of asset health, enabling data-driven decision-making.
-Improved asset reliability: Access to critical asset information and maintenance tasks from IMS allows for proactive maintenance planning and optimization of asset reliability.
-Streamlined processes: Automated synchronization between AMS and IMS streamlines data exchange processes, reducing manual effort and minimizing errors.
-Increased efficiency: Integration of functional location and equipment data from AMS into IMS improves the accuracy of performance monitoring and analysis, leading to more efficient asset management practices.
-User-friendly interface: Checkbox functionality in Maximo application simplifies the process of triggering data synchronization to Meridium, enhancing user experience and promoting adoption.
+            <!-- /.navbar-header -->
+            <ul class="nav navbar-nav navbar-right">
+			    <li class="dropdown">
+	        		<a href="#" class="dropdown-toggle avatar" data-toggle="dropdown"><i class="fa fa-tasks"></i></a>
+	        		<ul class="dropdown-menu">
+						<li class="dropdown-menu-header text-center">
+							<strong>My Tasks</strong>
+						</li>
+						<li class="m_2"><a href="{% url 'common-checkproddates' %}"><i class="fa fa-tasks"></i> Check PROD VM Dates </a></li>
+	        		</ul>
+	      		</li>
+			</ul>
+           
+            <div class="navbar-default sidebar" role="navigation">
+                <div class="sidebar-nav navbar-collapse">
+                    <ul class="nav" id="side-menu"> 
+                        <li>
+                            <a href="{% url 'common-home' %}"><i class="fa fa-dashboard fa-fw nav_icon"></i>Dashboard</a>
+                        </li>
+                        <li>
+                            <a href="{% url 'common-view-gwms' %}"><i class="fa fa-indent fa-fw nav_icon"></i>GWMS</a>                           
+                        </li>
+                        <li>
+                            <a href="{% url 'vulnerability-home' %}"><i class="fa fa-indent fa-fw nav_icon"></i>vulnerability</a>                           
+                        </li>
+                        <li>
+                            <a href="{% url 'common-passwordvault' %}"><i class="fa fa-indent fa-fw nav_icon"></i>Password Vault</a>                           
+                        </li>
+                    </ul>
+                </div>
+                <!-- /.sidebar-collapse -->
+            </div>
+            <!-- /.navbar-static-side -->
+        </nav>
+        <div id="page-wrapper">
+            <div  class="graphs">
+                    
+                {% block content %}
+    
+                {% endblock  %}
+            
+      
+            </div>
+       </div>
+      <!-- /#page-wrapper -->
+   </div>
+    <!-- /#wrapper -->
+    <!-- Bootstrap Core JavaScript -->
+    <script src="{% static 'js/bootstrap.min.js' %}"></script>
+</body>
+</html>
