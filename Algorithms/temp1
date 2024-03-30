@@ -1,32 +1,35 @@
-from sqlalchemy import create_engine, MetaData, Table, select
-
 # Database connection details
-hostname = 'your_hostname'
-port = 'your_port'
-servicename = 'your_servicename'
-username = 'your_username'
-password = 'your_password'
+$hostname = 'your_hostname'
+$port = 'your_port'
+$servicename = 'your_servicename'
+$username = 'your_username'
+$password = 'your_password'
 
-# Construct the connection string for SQLAlchemy
-connection_string = f'oracle+cx_oracle://{username}:{password}@{hostname}:{port}/{servicename}'
+# Construct the connection string
+$connectionString = "Data Source=(DESCRIPTION=(ADDRESS=(PROTOCOL=TCP)(HOST=$hostname)(PORT=$port))(CONNECT_DATA=(SERVICE_NAME=$servicename)));User Id=$username;Password=$password;"
 
-# Create an SQLAlchemy engine
-engine = create_engine(connection_string)
+# Create a connection object
+$connection = New-Object System.Data.OracleClient.OracleConnection($connectionString)
 
-# Create a metadata object
-metadata = MetaData()
+# Open the connection
+$connection.Open()
 
-# Reflect the table structure from the database
-workorder_table = Table('WORKORDER', metadata, autoload=True, autoload_with=engine)
+try {
+    # Create a command object with your SQL query
+    $sqlCommandText = "SELECT WONUM, DESCRIPTION, STATUS FROM WORKORDER WHERE WONUM = '123456'"  # Replace '123456' with your value
+    $command = New-Object System.Data.OracleClient.OracleCommand($sqlCommandText, $connection)
 
-# Create a select query
-select_query = select([workorder_table.c.WONUM, workorder_table.c.DESCRIPTION, workorder_table.c.STATUS]).\
-    where(workorder_table.c.WONUM == '123456')  # Replace '123456' with the actual value
+    # Execute the command and get the results
+    $reader = $command.ExecuteReader()
 
-# Execute the query and fetch the results
-with engine.connect() as connection:
-    result = connection.execute(select_query)
-    
-    # Fetch and print the data
-    for row in result:
-        print(row)
+    # Loop through the results and print them
+    while ($reader.Read()) {
+        Write-Output ("WONUM: " + $reader.GetValue(0) + ", DESCRIPTION: " + $reader.GetValue(1) + ", STATUS: " + $reader.GetValue(2))
+    }
+
+    # Close the reader
+    $reader.Close()
+} finally {
+    # Close the connection
+    $connection.Close()
+}
