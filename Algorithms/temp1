@@ -1,6 +1,32 @@
+from sqlalchemy import create_engine, MetaData, Table, select
 
-    # Define the absolute path where you want to save the file
-    output_directory = "/path/to/your/directory/"
+# Database connection details
+hostname = 'your_hostname'
+port = 'your_port'
+servicename = 'your_servicename'
+username = 'your_username'
+password = 'your_password'
 
-    # Generate the file name with the absolute path
-    output_file_name = os.path.join(output_directory, datetime.now().strftime("%Y-%m-%d_%H-%M-%S_servers.txt"))
+# Construct the connection string for SQLAlchemy
+connection_string = f'oracle+cx_oracle://{username}:{password}@{hostname}:{port}/{servicename}'
+
+# Create an SQLAlchemy engine
+engine = create_engine(connection_string)
+
+# Create a metadata object
+metadata = MetaData()
+
+# Reflect the table structure from the database
+workorder_table = Table('WORKORDER', metadata, autoload=True, autoload_with=engine)
+
+# Create a select query
+select_query = select([workorder_table.c.WONUM, workorder_table.c.DESCRIPTION, workorder_table.c.STATUS]).\
+    where(workorder_table.c.WONUM == '123456')  # Replace '123456' with the actual value
+
+# Execute the query and fetch the results
+with engine.connect() as connection:
+    result = connection.execute(select_query)
+    
+    # Fetch and print the data
+    for row in result:
+        print(row)
